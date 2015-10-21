@@ -7,34 +7,55 @@ using System.Globalization;
 
 namespace CustomerTask
 {
-    public delegate string StringFormat();
-    public class Customer
+    public class Customer : IFormattable
     {
         public string Name { get; set; }
         public string ContactPhone { get; set; }
         public decimal Revenue { get; set; }
-        private static List<StringFormat> stringFormates = new List<StringFormat>();
         public Customer(string name, string contactPhone, decimal revenue)
         {
             Name = name;
             ContactPhone = contactPhone;
             Revenue = revenue;
-            stringFormates.Add(StringFormat1);
-            stringFormates.Add(StringFormat2);
-            stringFormates.Add(StringFormat3);
-            stringFormates.Add(StringFormat4);
-            stringFormates.Add(StringFormat5);
         }
 
-        public string Show(int index)
+        public override string ToString()
         {
-            return stringFormates[index]();
+            return this.ToString("G", CultureInfo.CurrentCulture);
         }
 
-        public static void AddNewStringFormat(StringFormat s)
+        public string ToString(string format)
         {
-            stringFormates.Add(s);
+            return this.ToString(format, CultureInfo.CurrentCulture);
         }
+
+        public string ToString(string format, IFormatProvider provider)
+        {
+            if (String.IsNullOrEmpty(format)) format = "G";
+            if (provider == null) provider = CultureInfo.CurrentCulture;
+
+            switch(format.ToUpper())
+            {
+                case "G":
+                    return String.Format(provider, "Custom record: {0}", Name);
+                case "R":
+                    return String.Format(provider, "Custom record: {0:C}", Revenue);
+                case "P":
+                    return String.Format(provider, "Csutom record: {0}", ContactPhone);
+                case "A":
+                    return String.Format(provider, "Custom record: {0}, {1}, {2}", Name, ContactPhone, Revenue);
+                default:
+                    throw new FormatException(String.Format("The {0} format string is not supported.", format));
+
+            }
+        }
+
+
+
+
+
+
+
 
         private string StringFormat1()
         {
